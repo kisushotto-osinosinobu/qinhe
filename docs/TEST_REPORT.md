@@ -49,7 +49,7 @@
 | CSV 下载内容与统计人工算账 | 未执行 | 接口已实现，需按手动清单保留文件证据 |
 | 微信开发者工具模拟器 | 未执行 | 当前环境未安装/未连接开发者工具 |
 | 微信真机验证 | 被外部条件阻塞 | 缺少真实 AppID、合法 HTTPS 域名、服务器及开发者权限 |
-| GitHub Actions 远端运行 | 被外部条件阻塞 | 用户尚未提供实际仓库 URL，无法推送或取得运行链接 |
+| GitHub Actions 远端运行 | 通过 | 首次交付提交 `ab7d46480ffc781344517776178b6071c3f81ef6` 的 `clients` 与 `backend` 作业均成功：[运行 #34610802538](https://github.com/kisushotto-osinosinobu/qinhe/actions/runs/34610802538) |
 
 ## 复现命令
 

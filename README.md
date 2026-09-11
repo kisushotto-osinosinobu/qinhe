@@ -1,5 +1,7 @@
 # 青禾超市信息管理系统
 
+[![CI](https://github.com/kisushotto-osinosinobu/qinhe/actions/workflows/ci.yml/badge.svg)](https://github.com/kisushotto-osinosinobu/qinhe/actions/workflows/ci.yml)
+
 面向软件工程课程、项目展示与实际操作学习的完整全栈项目。Web 管理端和真实微信小程序工程共用一套 Spring Boot 业务服务与 MySQL 数据库，不维护两份演示数据。
 
 ## 已实现能力
