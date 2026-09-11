@@ -1,0 +1,26 @@
+{
+  "name": "supermarket-miniapp",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev:mp-weixin": "uni -p mp-weixin",
+    "build:mp-weixin": "uni build -p mp-weixin",
+    "typecheck": "vue-tsc --noEmit"
+  },
+  "dependencies": {
+    "@dcloudio/uni-app": "3.0.0-alpha-1000920260909822",
+    "@dcloudio/uni-components": "3.0.0-alpha-1000920260909822",
+    "@dcloudio/uni-mp-weixin": "3.0.0-alpha-1000920260909822",
+    "vue": "3.4.21"
+  },
+  "devDependencies": {
+    "@dcloudio/types": "3.4.32",
+    "@dcloudio/vite-plugin-uni": "3.0.0-alpha-1000920260909822",
+    "sass": "1.104.0",
+    "typescript": "5.9.3",
+    "vite": "8.2.2",
+    "vue-tsc": "3.3.11"
+  },
+  "packageManager": "pnpm@10.17.1"
+}

@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root-test-only
+          MYSQL_DATABASE: supermarket_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot-test-only"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=30
+    env:
+      DB_URL: jdbc:mysql://127.0.0.1:3306/supermarket_test?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false
+      DB_USERNAME: root
+      DB_PASSWORD: root-test-only
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+      - name: Compile, unit tests and MySQL integration tests
+        working-directory: backend
+        run: mvn -B clean verify
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-reports
+          path: |
+            backend/target/surefire-reports
+            backend/target/failsafe-reports
+
+  clients:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.17.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+          cache-dependency-path: |
+            web/pnpm-lock.yaml
+            miniapp/pnpm-lock.yaml
+      - name: Install and test Web
+        working-directory: web
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm typecheck
+          pnpm test
+          pnpm build
+      - name: Install and build WeChat mini program
+        working-directory: miniapp
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm typecheck
+          pnpm build:mp-weixin
+      - name: Upload client builds
+        uses: actions/upload-artifact@v4
+        with:
+          name: client-builds
+          path: |
+            web/dist
+            miniapp/dist/build/mp-weixin
