@@ -55,7 +55,7 @@
 | 微信端注销与员工权限 | 通过 | 会员注销接口 200；库存管理员登录 200，受保护的 `/api/inventory` 返回 200 并展示预警；普通会员调用员工接口的 403 由集成测试覆盖 |
 | 微信个人资料和修改密码页面 | 通过 | 两个新页面均在开发者工具模拟器中真实打开；为保留公共演示口令，未实际提交改密 |
 | 微信真机验证 | 被外部条件阻塞 | 已有可管理的测试 AppID；仍需手机扫码/开发者成员、可访问后端的 HTTPS 合法域名与服务器 |
-| GitHub Actions 远端运行 | 通过 | 首次交付提交 `ab7d46480ffc781344517776178b6071c3f81ef6` 的 `clients` 与 `backend` 作业均成功：[运行 #34610802538](https://github.com/kisushotto-osinosinobu/qinhe/actions/runs/34610802538) |
+| GitHub Actions 远端运行 | 通过 | 功能提交 `d741d791becc57534fdbc69c735dbf6cde551dd6` 的 `clients` 与 `backend` 作业均成功：[运行 #34681392238](https://github.com/kisushotto-osinosinobu/qinhe/actions/runs/34681392238) |
 
 ## 微信开发者工具缺陷发现与复验
 
