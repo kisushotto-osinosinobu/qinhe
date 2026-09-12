@@ -45,15 +45,15 @@ class BusinessLifecycleIT {
         assertThat(inventories.lock(productId).getCurrentQty()).isEqualTo(10);
 
         String pendingKey="cancel-"+UUID.randomUUID();
-        var pending=orders.create(new OrderDtos.CreateOrderRequest(pendingKey,List.of(new OrderDtos.OrderLine(productId,3)),false,null),member);
+        var pending=orders.create(new OrderDtos.CreateOrderRequest(pendingKey,"MINIAPP",List.of(new OrderDtos.OrderLine(productId,3)),false,null),member);
         long pendingId=((Number)pending.get("id")).longValue();
-        var duplicatePending=orders.create(new OrderDtos.CreateOrderRequest(pendingKey,List.of(new OrderDtos.OrderLine(productId,3)),false,null),member);
+        var duplicatePending=orders.create(new OrderDtos.CreateOrderRequest(pendingKey,"MINIAPP",List.of(new OrderDtos.OrderLine(productId,3)),false,null),member);
         assertThat(((Number)duplicatePending.get("id")).longValue()).isEqualTo(pendingId);
         assertThat(inventories.lock(productId).getReservedQty()).isEqualTo(3);
         orders.cancel(pendingId,member);orders.cancel(pendingId,member);
         assertThat(inventories.lock(productId).getReservedQty()).isZero();
 
-        var paid=orders.create(new OrderDtos.CreateOrderRequest("paid-"+UUID.randomUUID(),List.of(new OrderDtos.OrderLine(productId,4)),true,"CASH"),cashier);
+        var paid=orders.create(new OrderDtos.CreateOrderRequest("paid-"+UUID.randomUUID(),"WEB_POS",List.of(new OrderDtos.OrderLine(productId,4)),true,"CASH"),cashier);
         long orderId=((Number)paid.get("id")).longValue();
         assertThat(inventories.lock(productId).getCurrentQty()).isEqualTo(6);
         orders.pay(orderId,new OrderDtos.PayRequest("pay-repeat-"+UUID.randomUUID(),"CASH"),cashier);
@@ -74,7 +74,7 @@ class BusinessLifecycleIT {
         assertThatThrownBy(()->inventory.manualMovement(productId,2,false,1L,"库存不足拒绝"))
                 .isInstanceOf(BusinessException.class);
         ExecutorService pool=Executors.newFixedThreadPool(2);CountDownLatch ready=new CountDownLatch(2),go=new CountDownLatch(1);
-        Callable<Boolean> task=()->{ready.countDown();go.await(10,TimeUnit.SECONDS);try{orders.create(new OrderDtos.CreateOrderRequest("race-"+UUID.randomUUID(),List.of(new OrderDtos.OrderLine(productId,1)),false,null),member);return true;}catch(BusinessException ex){return false;}};
+        Callable<Boolean> task=()->{ready.countDown();go.await(10,TimeUnit.SECONDS);try{orders.create(new OrderDtos.CreateOrderRequest("race-"+UUID.randomUUID(),"MINIAPP",List.of(new OrderDtos.OrderLine(productId,1)),false,null),member);return true;}catch(BusinessException ex){return false;}};
         Future<Boolean>a=pool.submit(task),b=pool.submit(task);ready.await(10,TimeUnit.SECONDS);go.countDown();int successes=(a.get()?1:0)+(b.get()?1:0);pool.shutdownNow();
         assertThat(successes).isEqualTo(1);var stock=inventories.lock(productId);assertThat(stock.getReservedQty()).isEqualTo(1);assertThat(stock.availableQty()).isZero();
     }

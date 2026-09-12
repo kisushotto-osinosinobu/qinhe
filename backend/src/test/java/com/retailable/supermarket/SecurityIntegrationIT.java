@@ -49,11 +49,37 @@ class SecurityIntegrationIT {
         register(user1); register(user2);
         String token1 = login(user1, "Passw0rd!");
         String token2 = login(user2, "Passw0rd!");
-        String body = "{\"idempotencyKey\":\"test-"+suffix+"\",\"items\":[{\"productId\":1,\"quantity\":1}]}";
+        String body = "{\"idempotencyKey\":\"test-"+suffix+"\",\"channel\":\"MINIAPP\",\"items\":[{\"productId\":1,\"quantity\":1}]}";
         String response = mvc.perform(post("/api/orders").header("Authorization", "Bearer " + token1)
                 .contentType(MediaType.APPLICATION_JSON).content(body)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         long orderId = json.readTree(response).path("data").path("id").asLong();
         mvc.perform(get("/api/orders/" + orderId).header("Authorization", "Bearer " + token2))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void salesRolesAndChannelsAreEnforcedByBackend() throws Exception {
+        String suffix = Long.toString(System.nanoTime());
+        String memberUser = "c" + suffix.substring(Math.max(0, suffix.length()-10));
+        register(memberUser);
+        String member = login(memberUser, "Passw0rd!");
+        String stock = login("stock", "Passw0rd!");
+        String cashier = login("cashier", "Passw0rd!");
+        String key = "scope-" + suffix;
+
+        mvc.perform(post("/api/orders").header("Authorization", "Bearer " + stock)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"idempotencyKey\":\""+key+"-stock\",\"channel\":\"WEB_POS\",\"items\":[{\"productId\":1,\"quantity\":1}]}"))
+                .andExpect(status().isForbidden());
+        mvc.perform(get("/api/orders").header("Authorization", "Bearer " + stock))
+                .andExpect(status().isForbidden());
+        mvc.perform(post("/api/orders").header("Authorization", "Bearer " + member)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"idempotencyKey\":\""+key+"-member\",\"channel\":\"WEB_POS\",\"items\":[{\"productId\":1,\"quantity\":1}]}"))
+                .andExpect(status().isForbidden());
+        mvc.perform(post("/api/orders").header("Authorization", "Bearer " + cashier)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"idempotencyKey\":\""+key+"-cashier\",\"channel\":\"MINIAPP\",\"items\":[{\"productId\":1,\"quantity\":1}]}"))
                 .andExpect(status().isForbidden());
     }
 

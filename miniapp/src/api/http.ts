@@ -8,8 +8,13 @@ export function assetUrl(path?:string):string|undefined{
 type Method='GET'|'POST'|'PUT'|'DELETE'
 interface Envelope<T>{code:number;message:string;data:T}
 export function request<T>(path:string,method:Method='GET',data?:unknown):Promise<T>{
+  let payload=data as any
+  if(data&&typeof data==='object'&&!Array.isArray(data)){
+    payload={}
+    for(const [key,value] of Object.entries(data as Record<string,unknown>))if(value!==undefined&&value!==null)payload[key]=value
+  }
   return new Promise((resolve,reject)=>{
-    uni.request({url:API_BASE+path,method,data:data as any,header:{Authorization:token()?`Bearer ${token()}`:''},
+    uni.request({url:API_BASE+path,method,data:payload,header:{Authorization:token()?`Bearer ${token()}`:''},
       success(res:any){const body=res.data as Envelope<T>;if(res.statusCode===401){clearAuth();uni.showToast({title:'请重新登录',icon:'none'});reject(new Error('unauthorized'));return}if(res.statusCode>=200&&res.statusCode<300&&body.code===0)resolve(body.data);else{const message=body?.message||`请求失败 ${res.statusCode}`;uni.showToast({title:message,icon:'none'});reject(new Error(message))}},
       fail(err:any){uni.showToast({title:'无法连接服务器',icon:'none'});reject(err)}
     })

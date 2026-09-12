@@ -84,10 +84,10 @@
 小程序下单示例：
 
 ```json
-{"idempotencyKey":"client-uuid","items":[{"productId":1,"quantity":2}],"payNow":false}
+{"idempotencyKey":"client-uuid","channel":"MINIAPP","items":[{"productId":1,"quantity":2}],"autoPay":false}
 ```
 
-Web POS 可传 `payNow: true` 与 `paymentMethod: "CASH"`。同一个幂等键重复提交返回原订单。退货请求包含唯一 `idempotencyKey`、`reason` 和 `items: [{"saleItemId":1,"quantity":1}]`。
+Web POS 使用 `channel: "WEB_POS"`，可传 `autoPay: true` 与 `paymentMethod: "CASH"`；小程序会员必须使用 `channel: "MINIAPP"` 且不能自行标记收款。服务端按角色与渠道交叉校验。同一个幂等键重复提交返回原订单。退货请求包含唯一 `idempotencyKey`、`reason` 和 `items: [{"saleItemId":1,"quantity":1}]`。
 
 ## 统计与系统管理
 
@@ -102,4 +102,3 @@ Web POS 可传 `payNow: true` 与 `paymentMethod: "CASH"`。同一个幂等键�
 | GET | `/admin/roles` | 管理员 | 固定角色权限描述 |
 | GET | `/admin/audits` | 管理员 | 操作审计分页 |
 | GET/PUT | `/admin/config[/{key}]` | 管理员 | 基础配置查询/更新 |
-

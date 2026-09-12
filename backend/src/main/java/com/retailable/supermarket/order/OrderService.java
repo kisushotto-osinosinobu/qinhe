@@ -26,6 +26,10 @@ public class OrderService {
 
     @Transactional
     public Map<String,Object> create(CreateOrderRequest r,UserPrincipal principal){
+        boolean member="MEMBER".equals(principal.role());
+        if(member&&!"MINIAPP".equals(r.channel()))throw BusinessException.forbidden("会员只能通过小程序渠道下单");
+        if(!member&&!"WEB_POS".equals(r.channel()))throw BusinessException.forbidden("员工销售只能通过 Web 收银渠道创建");
+        if(member&&Boolean.TRUE.equals(r.autoPay()))throw BusinessException.forbidden("会员订单不能由客户端直接标记收款");
         Map<String,Object> existing=mapper.findByIdempotency(r.idempotencyKey());
         if(existing!=null)return detail(((Number)existing.get("id")).longValue(),principal);
         Set<Long> seen=new HashSet<>();List<OrderMapper.SaleItemRow> rows=new ArrayList<>();BigDecimal total=BigDecimal.ZERO;
@@ -35,8 +39,7 @@ public class OrderService {
             if(product==null||!"ON_SALE".equals(product.get("status")))throw BusinessException.badRequest("商品不存在或已下架: "+line.productId());
             var item=new OrderMapper.SaleItemRow();item.productId=line.productId();item.productCode=(String)product.get("code");item.barcode=(String)product.get("barcode");item.productName=(String)product.get("name");item.specification=(String)product.get("specification");item.unit=(String)product.get("unit");item.quantity=line.quantity();item.unitPrice=(BigDecimal)product.get("salePrice");item.amount=item.unitPrice.multiply(BigDecimal.valueOf(line.quantity()));rows.add(item);total=total.add(item.amount);
         }
-        boolean member="MEMBER".equals(principal.role());
-        var order=new OrderMapper.SaleOrderRow();order.orderNo=number("SO");order.idempotencyKey=r.idempotencyKey();order.channel=member?"MINIAPP":"WEB_POS";order.memberId=member?principal.id():null;order.cashierId=member?null:principal.id();order.totalAmount=total;mapper.insertOrder(order);
+        var order=new OrderMapper.SaleOrderRow();order.orderNo=number("SO");order.idempotencyKey=r.idempotencyKey();order.channel=r.channel();order.memberId=member?principal.id():null;order.cashierId=member?null:principal.id();order.totalAmount=total;mapper.insertOrder(order);
         for(var item:rows){item.orderId=order.id;mapper.insertItem(item);inventory.apply(item.productId,0,item.quantity,"SALE_RESERVE",order.orderNo+":"+item.id,principal.id(),"订单预占 "+order.orderNo);}
         audit.record("SALE_ORDER_CREATE","SALE_ORDER",order.id,order.orderNo);
         if(!member&&Boolean.TRUE.equals(r.autoPay()))payInternal(order.id,r.paymentMethod()==null?"CASH":r.paymentMethod(),principal);

@@ -122,6 +122,7 @@ pnpm build:mp-weixin
 ## 文档索引
 
 - [Windows 从零运行](docs/WINDOWS_SETUP.md)
+- [完整开发流程与验收基线](docs/DEVELOPMENT_PROCESS.md)
 - [API 文档](docs/API.md)
 - [数据库说明](docs/DATABASE.md)
 - [权限矩阵与业务状态](docs/PERMISSIONS_AND_STATES.md)

@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from 'vue'
 import { api, http } from '@/api/http'
 import { useAuthStore } from '@/stores/auth'
 import { Refresh } from '@element-plus/icons-vue'
+import { orderStatus } from '@/utils/orderStatus'
 
 const auth = useAuthStore()
 const loading = ref(false)
@@ -81,7 +82,7 @@ onMounted(load)
         <aside class="panel"><h2 style="margin-top:0">数据口径</h2><p style="line-height:1.75;color:var(--muted)">{{ data.salesDefinition || '净销售额按已付款订单减去退货金额计算。' }}</p><div class="notice">到店付款 / 模拟收款<br/>本系统不接入真实资金交易</div></aside>
       </div>
     </template>
-    <section v-else class="panel"><h2 style="margin-top:0">最近订单</h2><el-table :data="orders"><el-table-column prop="orderNo" label="订单号" min-width="190"/><el-table-column prop="status" label="状态" width="130"/><el-table-column prop="totalAmount" label="金额" width="110"><template #default="scope">¥{{ Number(scope.row.totalAmount).toFixed(2) }}</template></el-table-column><el-table-column prop="createdAt" label="下单时间" min-width="170"/></el-table></section>
+    <section v-else class="panel"><h2 style="margin-top:0">最近订单</h2><el-table :data="orders"><el-table-column prop="orderNo" label="订单号" min-width="190"/><el-table-column label="状态" width="130"><template #default="scope"><el-tag :type="orderStatus[scope.row.status]?.type||'info'">{{ orderStatus[scope.row.status]?.label||scope.row.status }}</el-tag></template></el-table-column><el-table-column prop="totalAmount" label="金额" width="110"><template #default="scope">¥{{ Number(scope.row.totalAmount).toFixed(2) }}</template></el-table-column><el-table-column prop="createdAt" label="下单时间" min-width="170"/></el-table></section>
   </div>
 </template>
 

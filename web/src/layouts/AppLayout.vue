@@ -9,7 +9,7 @@ const menu=computed(()=>[
   ...(auth.can('ADMIN','INVENTORY_MANAGER')?[{path:'/catalog',label:'商品与分类',icon:'Goods'},{path:'/suppliers',label:'供应商',icon:'OfficeBuilding'},{path:'/purchases',label:'采购入库',icon:'Van'}]:[]),
   ...(auth.isStaff?[{path:'/inventory',label:'库存中心',icon:'Box'}]:[]),
   ...(auth.can('ADMIN','CASHIER')?[{path:'/pos',label:'收银台',icon:'ShoppingCartFull'}]:[]),
-  {path:'/orders',label:auth.user?.role==='MEMBER'?'我的订单':'销售订单',icon:'Tickets'},
+  ...(auth.can('ADMIN','CASHIER','MEMBER')?[{path:'/orders',label:auth.user?.role==='MEMBER'?'我的订单':'销售订单',icon:'Tickets'}]:[]),
   ...(auth.can('ADMIN')?[{path:'/system',label:'系统管理',icon:'Setting'}]:[]),
 ])
 async function logout(){await auth.logout();router.push('/login')}
@@ -35,4 +35,3 @@ async function logout(){await auth.logout();router.push('/login')}
     </main>
   </div>
 </template>
-

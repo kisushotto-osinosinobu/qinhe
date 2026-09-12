@@ -6,6 +6,8 @@
     { "path": "pages/orders/index", "style": { "navigationBarTitleText": "我的订单" } },
     { "path": "pages/orders/detail", "style": { "navigationBarTitleText": "订单详情" } },
     { "path": "pages/profile/index", "style": { "navigationBarTitleText": "个人中心" } },
+    { "path": "pages/profile/edit", "style": { "navigationBarTitleText": "编辑资料" } },
+    { "path": "pages/profile/password", "style": { "navigationBarTitleText": "修改密码" } },
     { "path": "pages/auth/login", "style": { "navigationBarTitleText": "账号登录" } },
     { "path": "pages/auth/register", "style": { "navigationBarTitleText": "会员注册" } },
     { "path": "pages/staff/inventory", "style": { "navigationBarTitleText": "库存预警" } }
@@ -23,4 +25,3 @@
   },
   "globalStyle": { "navigationBarTextStyle": "white", "navigationBarTitleText": "青禾超市", "navigationBarBackgroundColor": "#0b6b57", "backgroundColor": "#f3f6f5" }
 }
-

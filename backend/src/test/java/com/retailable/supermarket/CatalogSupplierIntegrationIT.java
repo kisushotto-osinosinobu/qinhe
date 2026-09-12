@@ -40,6 +40,8 @@ class CatalogSupplierIntegrationIT {
                 .andExpect(status().isConflict());
         mvc.perform(get("/api/catalog/products").header("Authorization", bearer(token)).param("keyword", "P-" + suffix))
                 .andExpect(status().isOk());
+        mvc.perform(get("/api/catalog/public/products").param("categoryId", "undefined"))
+                .andExpect(status().isBadRequest());
 
         byte[] png = Base64.getDecoder().decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=");
         MockMultipartFile image = new MockMultipartFile("file", "pixel.png", "image/png", png);

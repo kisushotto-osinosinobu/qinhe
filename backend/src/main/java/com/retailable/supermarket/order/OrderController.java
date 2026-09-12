@@ -13,6 +13,7 @@ import java.util.Map;
 import static com.retailable.supermarket.order.OrderDtos.*;
 
 @RestController @RequestMapping("/api/orders")
+@PreAuthorize("hasAnyRole('ADMIN','CASHIER','MEMBER')")
 public class OrderController {
     private final OrderService service;public OrderController(OrderService service){this.service=service;}
     @GetMapping public ApiResponse<PageResult<Map<String,Object>>> page(@AuthenticationPrincipal UserPrincipal p,@RequestParam(required=false)String keyword,@RequestParam(required=false)String status,@RequestParam(defaultValue="1")int page,@RequestParam(defaultValue="20")int pageSize){return ApiResponse.ok(service.page(p,keyword,status,page,pageSize));}
